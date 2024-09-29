@@ -1,7 +1,7 @@
 VERSION = 4
 PATCHLEVEL = 9
 SUBLEVEL = 80
-EXTRAVERSION =
+EXTRAVERSION = -v7-CS596-RT-Group05
 NAME = Roaring Lionus
 
 # *DOCUMENTATION*
@@ -1708,8 +1708,3 @@ FORCE:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
-
-
-#clean:
-#	find . -type f | xargs touch
-#	rm -rf $(OBJS)
