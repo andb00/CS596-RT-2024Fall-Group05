@@ -3,10 +3,6 @@
 # subdirectories here. Add them in the ".gitignore" file
 # in that subdirectory instead.
 #
-# NOTE! Please use 'git ls-files -i --exclude-standard'
-# command after changing this file, to see if there are
-# any tracked files which get ignored after the change.
-#
 # Normal rules
 #
 .*
@@ -51,6 +47,22 @@ Module.symvers
 /vmlinuz
 /System.map
 /Module.markers
+
+#
+# Ignore kernel build artifacts
+#
+vmlinux
+vmlinux.o
+System.map
+modules.builtin
+modules.order
+Module.symvers
+mnt/
+firmware/    # Add this only if it's generated during the build process
+*.cmd
+*.tmp
+.tmp*
+.tmp_versions/
 
 #
 # Debian directory (make deb-pkg)
@@ -114,3 +126,4 @@ all.config
 
 # Kdevelop4
 *.kdev4
+
