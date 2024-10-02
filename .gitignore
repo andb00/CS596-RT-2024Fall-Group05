@@ -80,11 +80,12 @@ firmware/    # Add this only if it's generated during the build process
 !.gitignore
 !.mailmap
 !.cocciconfig
+!.config
 
 #
 # Generated include files
 #
-include/config
+# include/config
 include/generated
 arch/*/include/generated
 
