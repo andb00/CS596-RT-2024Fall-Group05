@@ -1,0 +1,10 @@
+Project 2 Writeup
+1. When a user space program calls a system call, first it loads the args and syscall # into registers. Then the user level programs traps to the kernel. The kernel finds the functions in the sys call table and runs it. Then it returns an error code and returns to the original program.
+
+2. Access to data structures in user space needs to be synced during race conditions. Ideally, before writing to any memory, the memory should obtain a lock for that memory location. This way, race conditions can be avoided.
+
+3. Since the kernel is priveleged, the kernel will be able to edit shared memory. To avoid this, shared mutexes or spin locks should be used to prevent simultaneous access.
+
+4. Andrew made the 5.1 app and makefile. Sawyer made the 5.2 lkos and 5.3.1 syscall. Andrew made the 5.3.2 app. Sawyer edited it and made the 5.3.3 lko. We both worked together to debug. The 3rd member of our group, Justin,  wasn't in contact.
+
+5. Quite a few. First, Sawyer forgot to give Andrew the sd card reader so he couldn't copy files from his host to the rpi. For the 5.2 lko, we originally tried to make it from the mac and were very confused by the Makefile since ../.. didn't point to a directory with a Makefile. For 5.3, we couldn't figure out why we couldn't edit the syscalltable. We thought that we had to edit access. It turned out that we had the wrong .config file.
