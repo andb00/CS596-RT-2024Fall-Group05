@@ -903,4 +903,8 @@ asmlinkage long sys_pkey_mprotect(unsigned long start, size_t len,
 asmlinkage long sys_pkey_alloc(unsigned long flags, unsigned long init_val);
 asmlinkage long sys_pkey_free(int pkey);
 
+asmlinkage long set_rsv(pid_t pid, struct timespec* C, struct timespec* T);
+asmlinkage long cancel_rsv(pid_t pid);
+asmlinkage long sys_wait_until_next_period(void);
+
 #endif
