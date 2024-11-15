@@ -12,6 +12,13 @@
 
 extern struct list_head plist;
 
+/*
+I started designing before fully understanding the problem
+The RBTree was because I thought it would be about as easy 
+  to implement as a linked list, with quicker inserts and searches
+Ended up being useless since I needed priorities in sorted order for O(n) insertion
+By the time I realized this it was easier to leave it than to delete
+  */
 extern struct rb_root rsv_root;
 // reservation 
 struct rsv {
@@ -21,6 +28,8 @@ struct rsv {
   struct timespec* C;
   // period/deadline
   struct timespec* T;
+
+  struct timer_data* t_data;
 };
 // priority linked list 
 struct priority_node{
@@ -28,6 +37,7 @@ struct priority_node{
   // period, used to calculate priority
   struct timespec* T;
   int priority;
+  pid_t pid;
 };
 
 // timer data (so callback will work)
@@ -42,14 +52,16 @@ struct rb_root *get_rb_root(void);
 
 
 struct list_head *get_plist(void);
-// linked list for priority
-// rb tree would be more efficient but difficult to implement   
+// linked list for priority( to maintain sorted order, 
+//    and allow search on multiple criteria)
 //
+struct task_struct *task_from_pid(pid_t pid){
 
-static enum hrtimer_restart callback(struct hrtimer *timer);
+enum hrtimer_restart callback(struct hrtimer *timer);
 
+struct timer_data *start_timer(pid_t pid, ktime_t time);
 
-int start_timer(pid_t pid, struct task_struct* task, ktime_t time);
+void cancel_timer(struct timer_data* data);
 
 int timeCompare(struct timespec* a, struct timespec* b);
 
@@ -58,5 +70,13 @@ int rsv_insert(struct rb_root* root, struct rsv* rsv);
 struct rsv *rsv_search(struct rb_root* root, pid_t pid);
 
 struct priority_node *plist_insert(struct list_head* plist, struct timespec* T, pid_t pid);
+
+struct priority_node* plist_search(struct list_head* plist, pid_t pid);
+
+int plist_remove(struct list_head* plist, pid_t pid);
+
+void start_task_time_accu(struct task_struct* task);
+
+ktime_t get_updated_task_comp_time(struct task_struct* task);
 
 #endif

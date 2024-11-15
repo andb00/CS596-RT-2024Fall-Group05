@@ -1,4 +1,4 @@
-obj-y += resv.o
+#obj-y += resv.o
 obj-y += wait.o
-resv-objs := sys_rsv.o rsv.o
-wait-objs := sys_wait.o
+#resv-objs := sys_rsv.o rsv.o
+wait-objs := sys_wait.o rsv.o
