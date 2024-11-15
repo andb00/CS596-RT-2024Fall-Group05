@@ -1970,6 +1970,8 @@ struct task_struct {
 	/* A live task holds one reference. */
 	atomic_t stack_refcount;
 #endif
+  ktime_t last_toggle_time;
+  ktime_t computation_time;
 /* CPU-specific state of this task */
 	struct thread_struct thread;
 /*

@@ -13,9 +13,8 @@ if [ $? -ne 0 ]; then
   echo "USB 2 isn't mounted"
   return -1
 fi
-env PATH=$PATH make -j $(nproc) ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=$HOME_DIR/mnt/root modules_install
+env PATH=$PATH make -j $(nproc) ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=$HOME_DIR/mnt/root modules_install | tail
 export KERNEL=kernel7
-rm $HOME_DIR/mnt/boot/$KERNEL-backup.img
 cp $HOME_DIR/mnt/boot/$KERNEL.img $HOME_DIR/mnt/boot/$KERNEL-backup.img
 
 cp $LINUX_DIR/arch/arm/boot/zImage $HOME_DIR/mnt/boot/$KERNEL.img
