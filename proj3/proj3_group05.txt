@@ -1,0 +1,21 @@
+Q1.
+  Concurrent Execution is when multiple processes are threaded together to allows multiple things to look as through they're happening simultaneously with only 1 CPU. In reality, the running process is switched many times.
+  Parallelized Execution means each process has a seperate processor. Multpile processes are literally running at the same time.
+
+Q2.
+  If a task exceeds it's budget, in our program, it continues to execute. We only stop processes when the wait syscall is called.   In reality, the kernel keeps track of processes, and when they exceed their budget it stops them with a SIGSTOP signal.
+
+Q3.
+  If a deadline is different than it's peroid RM scheduling wouldn't be a good choice. Processes with an infrequent period and a rapid deadline would have too low priority. Earliest Deadline First is a good option.
+
+Q4. A bunch. It was tough to understand what was expected. We weren't sure whether the priority was supposed to affect anything. It would be nice to specify that we don't actually have to use priority to schedule tasks.
+
+  Also, We didn't read the entire report before starting so we used a red black tree to store reservations. Later though, we also implemented a linked list for priority, which made things too confusing. The linked list was an interesting challenge. It need to maintain sorted order and allow inserts anywhere. 
+
+  The sd card got corrupted 3 or 4 times and we don't know why. We reflashed it each time.
+
+  Some of the error messages were really unhelpful. For instance there was SYSC.. storage class error when We didn't close a brace in a header file.
+
+  Overall it took a really long time, in part because testing code requires copying the kernel to the card and running it.
+  
+  I think this was a really cool project that taught me a lot about kernels.

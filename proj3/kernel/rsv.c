@@ -15,7 +15,7 @@ struct task_struct *task_from_pid(pid_t pid) {
 
   pid_ns = current->nsproxy->pid_ns_for_children;
   // re find the process
-  return = find_task_by_pid_ns(pid, pid_ns);
+  return  find_task_by_pid_ns(pid, pid_ns);
 }
 static enum hrtimer_restart callback(struct hrtimer *timer) {
   struct timer_data *data = NULL;
@@ -25,8 +25,12 @@ static enum hrtimer_restart callback(struct hrtimer *timer) {
   struct rsv *res = NULL;
   struct timespec comp_time_ts;
   int cmp = 0;
-  float llC = 0, llT = 0;
-  const float SECTONSEC = 1000000000;
+  long int lC = 0, lT = 0;
+  int util;
+  // no floating operation unit or long long
+  const long int SECTONSEC = 1000000000;
+  // shorten # to handle values up to 2000 seconds
+  const long int TRUNCATE = 1000;
   printk("KERN_INFO: callback called\n");
   data = container_of(timer, struct timer_data, timer);
   if (data == NULL) {
@@ -58,22 +62,24 @@ static enum hrtimer_restart callback(struct hrtimer *timer) {
   comp_time = get_updated_task_comp_time(task);
   comp_time_ts = ktime_to_timespec(comp_time);
 
-  cmp = timeCompare(comp_time_ts, res->C);
+  cmp = timeCompare(&comp_time_ts, res->C);
 
   if (cmp > 0) {
-    fC = res->C->tv_sec * SECTONSEC + res->C->tv_nsec;
-    fT = res->T->tv_sec * SECTONSEC + res->T->tv_nsec;
-    if (llT == 0) {
-      printk(KERN_INFO "Task %d: period is 0");
+    lC = comp_time_ts.tv_sec * (SECTONSEC / TRUNCATE) + comp_time_ts.tv_nsec / TRUNCATE;
+    lT = res->T->tv_sec * (SECTONSEC / TRUNCATE) + res->T->tv_nsec / TRUNCATE;
+    if (lT == 0) {
+      printk(KERN_INFO "Task %d: period is 0\n", pid);
     } else {
-      printk(KERN_INFO "Task %d: budget overrun (util: %d \%)\n", pid,
-             llC / llT);
+      util = (lC * 100) / lT;
+      printk(KERN_INFO "Task %d: budget overrun (util: %d %%)\n", pid, util);
+      send_sig(SIGUSR1, task, 1);
+      // also allow it to continue later
     }
   }
 
   start_task_time_accu(task);
 
-  if (task->state != RUNNING){
+  if (task->state != TASK_RUNNING){
     send_sig(SIGCONT, task, 1);
   }
 
@@ -81,14 +87,14 @@ static enum hrtimer_restart callback(struct hrtimer *timer) {
   return HRTIMER_RESTART;
 }
 
-struct timer_data *start_timer(pid_t pid, ktime_t time) {
+struct timer_data *start_timer(struct task_struct* task, ktime_t time) {
   struct timer_data *timer_data = NULL;
-  printk(KERN_INFO "starting timer for %d\n", pid);
 
-  if (task == NULL || task->pid != pid) {
+  if (task == NULL) {
     printk("Null or incorrect task");
     return NULL;
   }
+  printk(KERN_INFO "starting timer for %d\n", task->pid);
 
   timer_data = kzalloc(sizeof(struct timer_data), GFP_KERNEL);
   if (timer_data == NULL) {
@@ -99,7 +105,7 @@ struct timer_data *start_timer(pid_t pid, ktime_t time) {
   // block until next period
   hrtimer_init(&(timer_data->timer), CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
   timer_data->interval = time;
-  timer_data->pid = pid;
+  timer_data->pid = task->pid;
   timer_data->timer.function = callback;
   // timer_data->timer.data =
   hrtimer_start(&(timer_data->timer), time, HRTIMER_MODE_REL_PINNED);
@@ -273,7 +279,7 @@ int plist_remove(struct list_head *plist, pid_t pid) {
   }
   pnode = plist_search(plist, pid);
   if (pnode == NULL) {
-    printk(KERN_INFO "PLIST Remove: No node found with pid %d", pid_t);
+    printk(KERN_INFO "PLIST Remove: No node found with pid %d", pid);
     return -1;
   }
   list_del(&(pnode->list));
@@ -285,15 +291,14 @@ int plist_remove(struct list_head *plist, pid_t pid) {
 void start_task_time_accu(struct task_struct *task) {
   if (task == NULL) {
     printk("STARTING TIME ACCUMULATOR: TASK IS NULL");
-    return
+    return;
   }
   // current time
   task->last_toggle_time = ktime_get();
   task->computation_time = ktime_set(0, 0);
-  task->state = TASK_RUNNING;
 }
 
-ktime_t get_updated_task_comp_time(task_struct *task) {
+ktime_t get_updated_task_comp_time(struct task_struct *task) {
   ktime_t comp_time, time_since_toggle, now;
   comp_time = task->computation_time;
   if (task->state == TASK_RUNNING) {

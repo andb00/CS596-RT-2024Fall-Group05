@@ -92,7 +92,7 @@ SYSCALL_DEFINE3(set_rsv, pid_t, pid, struct timespec *, C, struct timespec *,T) 
 
   time = timespec_to_ktime(*kT);
 
-  timer_data = start_timer(pid, time);
+  timer_data = start_timer(task, time);
   if (timer_data == NULL) {
     kfree(kC);
     kfree(kT);

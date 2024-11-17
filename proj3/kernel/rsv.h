@@ -55,11 +55,9 @@ struct list_head *get_plist(void);
 // linked list for priority( to maintain sorted order, 
 //    and allow search on multiple criteria)
 //
-struct task_struct *task_from_pid(pid_t pid){
+struct task_struct *task_from_pid(pid_t pid);
 
-enum hrtimer_restart callback(struct hrtimer *timer);
-
-struct timer_data *start_timer(pid_t pid, ktime_t time);
+struct timer_data *start_timer(struct task_struct* task, ktime_t time);
 
 void cancel_timer(struct timer_data* data);
 
